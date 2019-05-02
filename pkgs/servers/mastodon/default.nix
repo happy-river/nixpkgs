@@ -3,8 +3,6 @@
 
 let
   version = "v2.9.0";
-  tmpDir = "/tmp/mastodon";
-  logDir = "/var/log/mastodon";
 
   src = stdenv.mkDerivation {
     name = "mastodon-src";
@@ -74,8 +72,8 @@ in stdenv.mkDerivation {
     done
 
     rm -rf log
-    ln -s ${logDir} log
-    ln -s ${tmpDir} tmp
+    ln -s /var/log/mastodon log
+    ln -s /tmp tmp
   '';
 
   installPhase = ''
