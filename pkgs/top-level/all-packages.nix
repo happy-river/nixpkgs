@@ -25542,4 +25542,6 @@ in
 
   sieveshell = with python3.pkgs; toPythonApplication managesieve;
 
+  mastodon = callPackage ../servers/mastodon { };
+
 }
