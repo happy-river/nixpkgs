@@ -1886,6 +1886,8 @@ in
 
   massren = callPackage ../tools/misc/massren { };
 
+  mastodon = callPackage ../servers/mastodon { };
+
   megasync = libsForQt5.callPackage ../applications/misc/megasync { };
 
   meritous = callPackage ../games/meritous { };
