@@ -25162,4 +25162,8 @@ in
 
   keycard-cli = callPackage ../tools/security/keycard-cli {};
 
+  mastodon = callPackage ../servers/mastodon {
+    yarn2nix = yarn2nix-moretea;
+  };
+
 }
