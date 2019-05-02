@@ -24859,4 +24859,9 @@ in
   uhubctl = callPackage ../tools/misc/uhubctl {};
 
   kodelife = callPackage ../applications/graphics/kodelife {};
+
+  mastodon = callPackage ../servers/mastodon {
+    yarn2nix = yarn2nix-moretea;
+  };
+
 }
