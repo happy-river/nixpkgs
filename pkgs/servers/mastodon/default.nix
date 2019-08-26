@@ -1,25 +1,9 @@
-{ nodejs-slim, yarn2nix, fetchFromGitHub, bundlerEnv,
-  stdenv, yarn, lib, ... }:
+{ nodejs-slim, yarn2nix-moretea, fetchFromGitHub, bundlerEnv,
+  stdenv, yarn, lib, callPackage, ... }:
 
 let
-  version = "v2.9.0";
-
-  src = stdenv.mkDerivation {
-    name = "mastodon-src";
-    src = fetchFromGitHub {
-      owner = "tootsuite";
-      repo = "mastodon";
-      rev = version;
-      sha256 = "0wh2qikmmwq96pgmrdw0qj9884i718gvif34z54659x75n75j392";
-    };
-    patches = [ ./mastodon-nix.patch ];
-    dontConfigure = true;
-    dontBuild = true;
-    installPhase = ''
-      mkdir -p $out
-      cp -r * $out/
-    '';
-  };
+  version = import ./version.nix;
+  src = callPackage ./source-patched.nix {};
 
   mastodon-gems = bundlerEnv {
     name = "mastodon-gems";
@@ -28,11 +12,12 @@ let
     gemset = ./gemset.nix;
   };
 
-  mastodon-js-modules = yarn2nix.mkYarnPackage {
+  mastodon-js-modules = yarn2nix-moretea.mkYarnPackage {
     name = "mastodon-modules";
     yarnNix = ./yarn.nix;
     packageJSON = ./package.json;
     inherit src;
+    inherit version;
   };
 
   mastodon-assets = stdenv.mkDerivation {
@@ -59,6 +44,8 @@ let
 in stdenv.mkDerivation {
   name = "mastodon";
   inherit src version;
+
+  passthru.updateScript = callPackage ./update.nix {};
 
   buildPhase = ''
     ln -s ${mastodon-js-modules}/libexec/mastodon/node_modules node_modules

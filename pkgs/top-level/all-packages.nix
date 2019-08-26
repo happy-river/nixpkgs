@@ -24860,8 +24860,6 @@ in
 
   kodelife = callPackage ../applications/graphics/kodelife {};
 
-  mastodon = callPackage ../servers/mastodon {
-    yarn2nix = yarn2nix-moretea;
-  };
+  mastodon = callPackage ../servers/mastodon { };
 
 }
