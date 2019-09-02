@@ -62,7 +62,7 @@ in stdenv.mkDerivation {
     ln -s /var/log/mastodon log
     ln -s /tmp tmp
   '';
-
+  propagatedBuildInputs = [ imagemagick ffmpeg file ];
   installPhase = ''
     mkdir -p $out
     cp -r * $out/
