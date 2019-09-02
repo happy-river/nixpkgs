@@ -42,7 +42,7 @@ let
   };
 
 in stdenv.mkDerivation {
-  name = "mastodon";
+  pname = "mastodon";
   inherit src version;
 
   passthru.updateScript = callPackage ./update.nix {};
