@@ -21,7 +21,7 @@ let
   };
 
   mastodon-assets = stdenv.mkDerivation {
-    name = "mastodon-assets";
+    pname = "mastodon-assets";
     inherit src version;
 
     buildInputs = [
