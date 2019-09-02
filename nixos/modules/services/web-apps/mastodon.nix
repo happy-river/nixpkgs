@@ -149,7 +149,9 @@ in {
         default = 6379;
       };
       dbHost = lib.mkOption {
-        description = "Postgres database host";
+        description = ''
+          Postgres database host address, or path to Postgres database socket directory (usually <filename>/run/postgres</filename>).
+          '';
         type = lib.types.str;
         default = "127.0.0.1";
       };
