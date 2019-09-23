@@ -1,4 +1,4 @@
-import ./make-test.nix ({ pkgs, ...} : let
+import ../make-test.nix ({ pkgs, ...} : let
 
   basicConfig = { ... }: {
     services.mastodon = {
@@ -57,7 +57,7 @@ import ./make-test.nix ({ pkgs, ...} : let
   });
 
 in {
-  name = "mastodon";
+  name = "mastodon-webserver";
   meta = with pkgs.stdenv.lib.maintainers; {
     maintainers = [];
   };
