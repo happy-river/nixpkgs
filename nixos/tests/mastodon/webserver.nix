@@ -1,4 +1,4 @@
-import ./make-test.nix ({ pkgs, ...} : let
+import ../make-test.nix ({ pkgs, ...} : let
 
   basicConfig = { ... }: {
     services.mastodon = {

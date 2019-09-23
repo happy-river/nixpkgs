@@ -149,7 +149,8 @@ in
   #logstash = handleTest ./logstash.nix {};
   lorri = handleTest ./lorri/default.nix {};
   mailcatcher = handleTest ./mailcatcher.nix {};
-  mastodon = handleTest ./mastodon.nix {};
+  mastodon.webserver = handleTest ./mastodon/webserver.nix {};
+  mastodon.package-tests = handleTest ./mastodon/package-tests.nix {};
   mathics = handleTest ./mathics.nix {};
   matomo = handleTest ./matomo.nix {};
   matrix-synapse = handleTest ./matrix-synapse.nix {};
