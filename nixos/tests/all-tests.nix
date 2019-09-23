@@ -156,7 +156,8 @@ in
   loki = handleTest ./loki.nix {};
   #logstash = handleTest ./logstash.nix {};
   mailcatcher = handleTest ./mailcatcher.nix {};
-  mastodon = handleTest ./mastodon.nix {};
+  mastodon.webserver = handleTest ./mastodon/webserver.nix {};
+  mastodon.package-tests = handleTest ./mastodon/package-tests.nix {};
   mathics = handleTest ./mathics.nix {};
   matrix-synapse = handleTest ./matrix-synapse.nix {};
   mediawiki = handleTest ./mediawiki.nix {};
