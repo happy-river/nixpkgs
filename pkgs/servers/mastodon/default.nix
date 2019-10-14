@@ -52,10 +52,17 @@ in stdenv.mkDerivation {
     ln -s ${mastodon-assets}/public/assets public/assets
     ln -s ${mastodon-assets}/public/packs public/packs
 
+    for b in $(ls bin/)
+    do
+      if [ -f bin/$b ]; then
+        sed -i 's#/usr/bin/env ruby#${mastodon-gems.wrappedRuby}/bin/ruby#g' bin/$b
+      fi
+    done
     for b in $(ls ${mastodon-gems}/bin/)
     do
-      rm -f bin/$b
-      ln -s ${mastodon-gems}/bin/$b bin/$b
+      if [ ! -f bin/$b ]; then
+        ln -s ${mastodon-gems}/bin/$b bin/$b
+      fi
     done
 
     rm -rf log
