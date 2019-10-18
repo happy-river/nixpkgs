@@ -4,27 +4,6 @@ let
   cfg = config.services.mastodon;
 
   env = {
-    RAILS_ENV = "production";
-    NODE_ENV = "production";
-
-    VAPID_PUBLIC_KEY = cfg.vapidPublicKey;
-    DB_USER = cfg.dbUser;
-    SMTP_LOGIN  = cfg.smtpLogin;
-
-    REDIS_HOST = cfg.redisHost;
-    REDIS_PORT = toString(cfg.redisPort);
-    DB_HOST = cfg.dbHost;
-    DB_PORT = toString(cfg.dbPort);
-    DB_NAME = cfg.dbName;
-    LOCAL_DOMAIN = cfg.localDomain;
-    SMTP_SERVER = cfg.smtpServer;
-    SMTP_PORT = toString(cfg.smtpPort);
-    SMTP_FROM_ADDRESS = cfg.smtpFromAddress;
-    PAPERCLIP_ROOT_PATH = "/var/lib/mastodon/public-system";
-    PAPERCLIP_ROOT_URL = "/system";
-    ES_ENABLED = if (cfg.elasticsearchHost != null) then "true" else "false";
-    ES_HOST = cfg.elasticsearchHost;
-    ES_PORT = toString(cfg.elasticsearchPort);
   };
 
 in {
@@ -210,6 +189,30 @@ in {
         VAPID_PRIVATE_KEY=$(cat ${cfg.vapidPrivateKeyFile})
         DB_PASS=$(cat ${cfg.dbPassFile})
         SMTP_PASSWORD=$(cat ${cfg.smtpPasswordFile})
+        RAILS_ENV=production
+        NODE_ENV=production
+
+        VAPID_PUBLIC_KEY="${cfg.vapidPublicKey}"
+        DB_USER="${cfg.dbUser}"
+        SMTP_LOGIN="${cfg.smtpLogin}"
+        REDIS_HOST="${cfg.redisHost}"
+        REDIS_PORT="${toString(cfg.redisPort)}"
+        DB_HOST="${cfg.dbHost}"
+        DB_PORT="${toString(cfg.dbPort)}"
+        DB_NAME="${cfg.dbName}"
+        LOCAL_DOMAIN="${cfg.localDomain}"
+        SMTP_SERVER="${cfg.smtpServer}"
+        SMTP_PORT="${toString(cfg.smtpPort)}"
+        SMTP_FROM_ADDRESS="${cfg.smtpFromAddress}"
+        PAPERCLIP_ROOT_PATH=/var/lib/mastodon/public-system
+        PAPERCLIP_ROOT_URL=/system
+      '' + (if (cfg.elasticsearchHost != null) then ''
+        ES_ENABLED=true
+        ES_HOST="${cfg.elasticsearchHost}"
+        ES_PORT="${toString(cfg.elasticsearchPort)}"
+      '' else ''
+        ES_ENABLED=false
+      '') + ''
         EOF
       '';
       serviceConfig = {

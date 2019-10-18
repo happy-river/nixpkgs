@@ -95,9 +95,20 @@ in {
 
   testScript =
     ''
+      sub tootctl ($) {
+        my $args = $_[0];
+        my $esc = $args =~ s/'/'\\${"'"}'/gr;
+        return "su mastodon -s /bin/sh -c 'export \$(cat /var/lib/mastodon/.secrets_env | xargs) && \${pkgs.mastodon}/bin/tootctl $esc'";
+      }
+
       startAll;
       $alice->waitForUnit("multi-user.target");
+      $alice->succeed(tootctl "accounts create aliceadmin " .
+                               "--email alice\@localhost:55001 " .
+                               "--confirmed " .
+                               "--role admin");
       $alice->waitForOpenPort(55001);
-      $alice->succeed("curl http://localhost:55001/");
+      $alice->succeed("curl --fail http://localhost:55001/\@aliceadmin");
+      $alice->fail("curl --fail http://localhost:55001/\@nobody");
     '';
 })
