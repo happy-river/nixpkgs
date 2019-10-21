@@ -323,14 +323,12 @@ in {
       wantedBy = [ "multi-user.target" ];
     };
 
-    systemd.services.mastodon-init-db = {
+    systemd.services.mastodon-init-db = lib.mkIf cfg.automaticMigrations {
       script = ''
-        test -f /var/lib/mastodon/.load-schema && (rake db:schema:load && rm -f /var/lib/mastodon/.load-schema)${if cfg.automaticMigrations then " || rake db:migrate" else ""}
+        rake db:migrate
       '';
       path = [ pkgs.mastodon ];
-      environment = env // {
-        SAFETY_ASSURED = "1";
-      };
+      environment = env;
       serviceConfig = {
         Type = "oneshot";
         User = cfg.user;
@@ -346,7 +344,9 @@ in {
     };
 
     systemd.services.mastodon-streaming = {
-      after = [ "mastodon-init-db.service" "network.target" ];
+      after = [ "network.target" ]
+        ++ (if databaseActuallyCreateLocally then [ "postgresql.service" ] else [])
+        ++ (if cfg.automaticMigrations then [ "mastodon-init-db.service" ] else [ "mastodon-init-dirs.service" ]);
       description = "Mastodon streaming";
       wantedBy = [ "multi-user.target" ];
       environment = env // {
@@ -367,7 +367,9 @@ in {
     };
 
     systemd.services.mastodon-web = {
-      after = [ "mastodon-init-db.service" "network.target" ];
+      after = [ "network.target" ]
+        ++ (if databaseActuallyCreateLocally then [ "postgresql.service" ] else [])
+        ++ (if cfg.automaticMigrations then [ "mastodon-init-db.service" ] else [ "mastodon-init-dirs.service" ]);
       description = "Mastodon web";
       wantedBy = [ "multi-user.target" ];
       environment = env // {
@@ -389,7 +391,9 @@ in {
     };
 
     systemd.services.mastodon-sidekiq = {
-      after = [ "mastodon-init-db.service" "network.target" ];
+      after = [ "network.target" ]
+        ++ (if databaseActuallyCreateLocally then [ "postgresql.service" ] else [])
+        ++ (if cfg.automaticMigrations then [ "mastodon-init-db.service" ] else [ "mastodon-init-dirs.service" ]);
       description = "Mastodon sidekiq";
       wantedBy = [ "multi-user.target" ];
       environment = env // {
@@ -449,11 +453,7 @@ in {
           ensurePermissions."DATABASE ${cfg.database.name}" = "ALL PRIVILEGES";
         }
       ];
-      ensureDatabases."${cfg.database.name}".initialScript = pkgs.writeScript "mastodon-load-schema" ''
-        #!${pkgs.stdenv.shell}
-        mkdir -p /var/lib/mastodon
-        touch /var/lib/mastodon/.load-schema
-      '';
+      ensureDatabases = [ cfg.database.name ];
     };
 
     users.users.mastodon = lib.mkIf (cfg.user == "mastodon") {
