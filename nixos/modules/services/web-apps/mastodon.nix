@@ -435,8 +435,12 @@ in {
       };
     };
 
-    services.postfix.enable = cfg.smtp.createLocally && cfg.smtp.host == "127.0.0.1";
-    services.redis.enable = cfg.redis.createLocally && cfg.redis.host == "127.0.0.1";
+    services.postfix = lib.mkIf (cfg.smtp.createLocally && cfg.smtp.host == "127.0.0.1") {
+      enable = true;
+    };
+    services.redis = lib.mkIf (cfg.redis.createLocally && cfg.redis.host == "127.0.0.1") {
+      enable = true;
+    };
     services.postgresql = lib.mkIf databaseActuallyCreateLocally {
       enable = true;
       ensureUsers = [
