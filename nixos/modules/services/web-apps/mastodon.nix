@@ -325,9 +325,17 @@ in {
 
     systemd.services.mastodon-init-db = lib.mkIf cfg.automaticMigrations {
       script = ''
-        rake db:migrate
+        if [ `psql mastodon -c \
+                "select count(*) from pg_class c \
+                join pg_namespace s on s.oid = c.relnamespace \
+                where s.nspname not in ('pg_catalog', 'pg_toast', 'information_schema') \
+                and s.nspname not like 'pg_temp%';" | sed -n 3p` -eq 0 ]; then
+          SAFETY_ASSURED=1 rake db:schema:load
+        else
+          rake db:migrate
+        fi
       '';
-      path = [ pkgs.mastodon ];
+      path = [ pkgs.mastodon pkgs.postgresql ];
       environment = env;
       serviceConfig = {
         Type = "oneshot";
