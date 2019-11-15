@@ -1,4 +1,4 @@
-import ../make-test.nix ({ pkgs, ...} : let
+import ../make-test-python.nix ({ pkgs, ...} : let
 
   basicConfig = { ... }: {
     services.mastodon = {
@@ -30,9 +30,9 @@ in {
 
   testScript =
     ''
-      startAll;
-      $alice->waitForUnit("multi-user.target");
-      $alice->waitForOpenPort(55001);
-      $alice->succeed("curl http://localhost:55001/");
+      start_all()
+      alice.wait_for_unit("multi-user.target")
+      alice.wait_for_open_port(55001)
+      alice.succeed("curl http://localhost:55001/")
     '';
 })

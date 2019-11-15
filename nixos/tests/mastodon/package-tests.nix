@@ -1,6 +1,6 @@
 # Run the mastodon package tests.  They can't be run as part of the
 # package build because they require PostgreSQL and Redis.
-import ../make-test.nix ({ pkgs, ...} :
+import ../make-test-python.nix ({ pkgs, ...} :
 {
   name = "mastodon-package-tests";
   meta = with pkgs.stdenv.lib.maintainers; {
@@ -50,24 +50,26 @@ import ../make-test.nix ({ pkgs, ...} :
     };
 
   testScript = ''
-    sub su ($) {
-      my $cmd = $_[0];
-      my $esc = $cmd =~ s/'/'\\${"'"}'/gr;
-      return "su - tester -c '$esc'";
-    }
+    def su(cmd):
+        return f"su - tester -c '{cmd}'"
 
-    startAll;
-    $machine->succeed(su "cp -r ${pkgs.mastodon} mastodon;" .
-                         "chmod -R u+w mastodon;" .
-                         "rm mastodon/{log,tmp}; mkdir mastodon/{log,tmp};" .
-                         "rm -r mastodon/node_modules mastodon/public/{assets,packs};" .
-                         "cp -rH ${pkgs.mastodon}/node_modules mastodon/node_modules;" .
-                         "chmod -R u+w mastodon/node_modules");
 
-    $machine->succeed(su "cd mastodon; rails assets:precompile");
-    $machine->succeed(su "cd mastodon; rails db:environment:set");
-    $machine->succeed(su "cd mastodon; rails db:schema:load");
-    $machine->log($machine->succeed(su "cd mastodon; rspec --no-color"));  # Ruby tests.
-    $machine->log($machine->succeed(su "cd mastodon; yarn run jest"));     # Javascript tests.
+    start_all()
+    machine.succeed(
+        su(
+            "cp -r ${pkgs.mastodon} mastodon;"
+            "chmod -R u+w mastodon;"
+            "rm mastodon/{log,tmp}; mkdir mastodon/{log,tmp};"
+            "rm -r mastodon/node_modules mastodon/public/{assets,packs};"
+            "cp -rH ${pkgs.mastodon}/node_modules mastodon/node_modules;"
+            "chmod -R u+w mastodon/node_modules"
+        )
+    )
+
+    machine.succeed(su("cd mastodon; rails assets:precompile"))
+    machine.succeed(su("cd mastodon; rails db:environment:set"))
+    machine.succeed(su("cd mastodon; rails db:schema:load"))
+    machine.log(machine.succeed(su("cd mastodon; rspec --no-color")))  # Ruby tests.
+    machine.log(machine.succeed(su("cd mastodon; yarn run jest")))  # Javascript tests.
   '';
 })
